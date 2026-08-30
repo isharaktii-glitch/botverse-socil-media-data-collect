@@ -3,57 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BotVerse Dashboard</title>
+    <title>BotVerse AI - Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; background-color: #111827; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .container { background: #1f2937; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); width: 100%; max-width: 400px; }
-        h1 { text-align: center; color: #60a5fa; margin-top: 0; }
-        label { display: block; margin-bottom: 5px; font-size: 14px; }
-        input, textarea { width: 100%; padding: 8px; margin-bottom: 15px; background: #374151; border: 1px solid #4b5563; border-radius: 4px; color: white; box-sizing: border-box; }
-        button { width: 100%; padding: 10px; background: #2563eb; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
-        button:hover { background: #1d4ed8; }
-        .status { margin-top: 15px; padding: 10px; background: #374151; border-radius: 4px; text-align: center; }
+        :root { --neon-blue: #00f3ff; --neon-purple: #bc13fe; --bg-dark: #0a0b10; }
+        * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { margin: 0; padding: 20px; background: var(--bg-dark); color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        body::before { content: ''; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(0,243,255,0.1) 0%, rgba(10,11,16,0) 70%); animation: rotate 20s linear infinite; z-index: -1; }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .main-container { display: flex; gap: 40px; align-items: center; max-width: 1200px; width: 100%; }
+        .hero-section { flex: 1; text-align: center; }
+        .robot-img { width: 100%; max-width: 350px; filter: drop-shadow(0 0 30px var(--neon-blue)) drop-shadow(0 0 60px var(--neon-purple)); animation: float 4s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        .hero-title { font-size: 3rem; font-weight: 900; background: linear-gradient(to right, var(--neon-blue), var(--neon-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 20px rgba(0,243,255,0.5); margin: 20px 0 10px; }
+        .hero-subtitle { color: #a0aec0; font-size: 1.2rem; }
+        .dashboard-box { flex: 1; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); padding: 30px; border-radius: 20px; box-shadow: 0 0 40px rgba(0,0,0,0.5); }
+        h1, h2 { text-align: center; font-weight: 700; color: white; margin-top: 0; }
+        h2 { background: linear-gradient(to right, #fff, var(--neon-blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 15px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; outline: none; transition: 0.3s; }
+        input:focus { border-color: var(--neon-blue); box-shadow: 0 0 15px rgba(0,243,255,0.3); }
+        button { width: 100%; padding: 12px; background: linear-gradient(to right, var(--neon-blue), var(--neon-purple)); color: #000; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; margin-bottom: 15px; }
+        button:hover { transform: translateY(-2px); box-shadow: 0 5px 25px rgba(0,243,255,0.4); }
+        .hidden { display: none; }
+        .package-card { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border-bottom: 1px solid rgba(255,255,255,0.1); padding: 12px; text-align: left; }
+        th { color: var(--neon-blue); }
+        @media (max-width: 900px) { .main-container { flex-direction: column; } .hero-title { font-size: 2rem; } .robot-img { max-width: 200px; } }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>BotVerse Dashboard</h1>
-        <label>Target Group URL</label>
-        <input type="text" id="url" placeholder="https://facebook.com/groups/...">
-        
-        <label>Cookies (JSON Array)</label>
-        <textarea id="cookies" rows="3" placeholder="[]"></textarea>
-        
-        <button onclick="startCampaign()">Start Campaign</button>
-        <div class="status" id="status">Status: Idle</div>
+    <div class="main-container">
+        <div class="hero-section">
+            <img src="https://cdn-icons-png.flaticon.com/512/4668/4668781.png" alt="3D Robot" class="robot-img">
+            <h1 class="hero-title">BOTVERSE AI</h1>
+            <p class="hero-subtitle">100% AI Lead Generation & Auto-Closer Machine</p>
+        </div>
+        <div class="dashboard-box">
+            <div id="auth-view">
+                <h2>System Login</h2>
+                <input type="email" id="login-email" placeholder="Email Address">
+                <input type="password" id="login-pass" placeholder="Password">
+                <button onclick="login()">Login to BotVerse</button>
+                <hr style="border-color: rgba(255,255,255,0.1); margin: 20px 0;">
+                <h2>New User? Register</h2>
+                <input type="email" id="reg-email" placeholder="Email">
+                <input type="text" id="reg-username" placeholder="Username">
+                <input type="password" id="reg-pass" placeholder="Password">
+                <button onclick="register()" style="background: transparent; color: var(--neon-blue); border: 1px solid var(--neon-blue);">Create Account</button>
+            </div>
+            <div id="user-view" class="hidden">
+                <h2>Welcome, <span id="user-name" style="color: var(--neon-blue);"></span></h2>
+                <p style="text-align:center;">Package: <span id="user-pkg" style="color: var(--neon-blue);"></span> | Status: <span id="user-status"></span></p>
+                <div class="package-card">
+                    <h3>Starter Pack - Rs. 1500</h3>
+                    <p style="font-size:12px; color:#ccc;">1 FB Account, 30 DMs/day</p>
+                    <input type="file" id="slip-starter" accept="image/*">
+                    <button onclick="uploadSlip('Starter')">Upload Slip & Verify</button>
+                    <button id="req-btn-starter" class="hidden" onclick="requestPackage()">Request Package</button>
+                </div>
+                <div class="package-card">
+                    <h3>Pro Pack - Rs. 3500</h3>
+                    <p style="font-size:12px; color:#ccc;">3 FB Accounts, 100 DMs/day</p>
+                    <input type="file" id="slip-pro" accept="image/*">
+                    <button onclick="uploadSlip('Pro')">Upload Slip & Verify</button>
+                    <button id="req-btn-pro" class="hidden" onclick="requestPackage()">Request Package</button>
+                </div>
+            </div>
+            <div id="admin-view" class="hidden">
+                <h2>Admin Control Panel</h2>
+                <input type="text" id="search-user" placeholder="Search by username..." onkeyup="searchUsers()">
+                <table>
+                    <thead><tr><th>Email</th><th>Username</th><th>Package</th><th>Status</th><th>Slip</th><th>Action</th></tr></thead>
+                    <tbody id="user-table"></tbody>
+                </table>
+            </div>
+        </div>
     </div>
-
     <script>
-        async function startCampaign() {
-            const url = document.getElementById('url').value;
-            const cookies = document.getElementById('cookies').value;
-            const statusDiv = document.getElementById('status');
-            
-            statusDiv.innerText = "Status: Loading...";
-
-            try {
-                const response = await fetch("http://localhost:8000/api/start-campaign", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        target_url: url,
-                        cookies: cookies ? JSON.parse(cookies) : []
-                    })
-                });
-                const data = await response.json();
-                if (response.ok) {
-                    statusDiv.innerText = "Status: Success! Leads: " + data.result.leads_count;
-                } else {
-                    statusDiv.innerText = "Status: Error: " + data.detail;
-                }
-            } catch (error) {
-                statusDiv.innerText = "Status: Error: " + error.message;
-            }
+        let currentEmail = "";
+        async function register() {
+            const email = document.getElementById('reg-email').value;
+            const username = document.getElementById('reg-username').value;
+            const password = document.getElementById('reg-pass').value;
+            const res = await fetch("http://localhost:8000/api/register", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({email, username, password}) });
+            const data = await res.json(); alert(data.message || data.detail);
+        }
+        async function login() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-pass').value;
+            currentEmail = email;
+            const res = await fetch("http://localhost:8000/api/login", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({email, password}) });
+            const data = await res.json();
+            if (!res.ok) return alert(data.detail);
+            document.getElementById('auth-view').classList.add('hidden');
+            if (data.role === "admin") { document.getElementById('admin-view').classList.remove('hidden'); loadUsers(); }
+            else { document.getElementById('user-view').classList.remove('hidden'); document.getElementById('user-name').innerText = data.username; document.getElementById('user-pkg').innerText = data.package; document.getElementById('user-status').innerText = data.status; }
+        }
+        async function uploadSlip(pkg) {
+            const fileInput = document.getElementById(`slip-${pkg.toLowerCase()}`);
+            const formData = new FormData();
+            formData.append("email", currentEmail);
+            formData.append("package", pkg);
+            formData.append("file", fileInput.files[0]);
+            const res = await fetch("http://localhost:8000/api/upload-slip", { method: "POST", body: formData });
+            const data = await res.json(); alert(data.message);
+            if (data.valid) { document.getElementById(`req-btn-${pkg.toLowerCase()}`).classList.remove('hidden'); }
+        }
+        async function requestPackage() {
+            const res = await fetch("http://localhost:8000/api/request-package", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({email: currentEmail}) });
+            const data = await res.json(); alert(data.message);
+        }
+        async function loadUsers() {
+            const res = await fetch("http://localhost:8000/api/admin/users");
+            const data = await res.json();
+            const tbody = document.getElementById('user-table');
+            tbody.innerHTML = '';
+            data.users.forEach(u => {
+                tbody.innerHTML += `<tr><td>${u.email}</td><td>${u.username}</td><td>${u.package}</td><td style="color: ${u.status==='Active'?'#00ff00':'orange'}">${u.status}</td><td>${u.slip_path ? `<a href="http://localhost:8000/${u.slip_path}" target="_blank" style="color:var(--neon-blue);">View Slip</a>` : 'N/A'}</td><td>${u.status === 'Requested' ? `<button onclick="approveUser('${u.email}')">Activate</button>` : '-'}</td></tr>`;
+            });
+        }
+        async function approveUser(email) {
+            const res = await fetch("http://localhost:8000/api/admin/approve", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({email}) });
+            const data = await res.json(); alert(data.message); loadUsers();
+        }
+        function searchUsers() {
+            const input = document.getElementById('search-user').value.toUpperCase();
+            const rows = document.querySelectorAll('#user-table tr');
+            rows.forEach(row => { const username = row.cells[1].innerText.toUpperCase(); row.style.display = username.includes(input) ? "" : "none"; });
         }
     </script>
 </body>
