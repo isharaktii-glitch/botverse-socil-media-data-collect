@@ -82,51 +82,61 @@
     </div>
     <script>
         let currentEmail = "";
+        
+        // Colab එකෙන් ආපු ඔබේ Bot එකේ ලින්ක් එක මෙතනින් දාලා තියෙනවා
+        const BOT_URL = "https://fancy-kings-deny.loca.lt";
+
         async function register() {
             const email = document.getElementById('reg-email').value;
             const username = document.getElementById('reg-username').value;
             const password = document.getElementById('reg-pass').value;
-            const res = await fetch("http://localhost:8000/api/register", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({email, username, password}) });
+            const res = await fetch(`${BOT_URL}/api/register`, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({email, username, password}) });
             const data = await res.json(); alert(data.message || data.detail);
         }
+        
         async function login() {
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-pass').value;
             currentEmail = email;
-            const res = await fetch("http://localhost:8000/api/login", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({email, password}) });
+            const res = await fetch(`${BOT_URL}/api/login`, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({email, password}) });
             const data = await res.json();
             if (!res.ok) return alert(data.detail);
             document.getElementById('auth-view').classList.add('hidden');
             if (data.role === "admin") { document.getElementById('admin-view').classList.remove('hidden'); loadUsers(); }
             else { document.getElementById('user-view').classList.remove('hidden'); document.getElementById('user-name').innerText = data.username; document.getElementById('user-pkg').innerText = data.package; document.getElementById('user-status').innerText = data.status; }
         }
+        
         async function uploadSlip(pkg) {
             const fileInput = document.getElementById(`slip-${pkg.toLowerCase()}`);
             const formData = new FormData();
             formData.append("email", currentEmail);
             formData.append("package", pkg);
             formData.append("file", fileInput.files[0]);
-            const res = await fetch("http://localhost:8000/api/upload-slip", { method: "POST", body: formData });
+            const res = await fetch(`${BOT_URL}/api/upload-slip`, { method: "POST", body: formData });
             const data = await res.json(); alert(data.message);
             if (data.valid) { document.getElementById(`req-btn-${pkg.toLowerCase()}`).classList.remove('hidden'); }
         }
+        
         async function requestPackage() {
-            const res = await fetch("http://localhost:8000/api/request-package", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({email: currentEmail}) });
+            const res = await fetch(`${BOT_URL}/api/request-package`, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({email: currentEmail}) });
             const data = await res.json(); alert(data.message);
         }
+        
         async function loadUsers() {
-            const res = await fetch("http://localhost:8000/api/admin/users");
+            const res = await fetch(`${BOT_URL}/api/admin/users`);
             const data = await res.json();
             const tbody = document.getElementById('user-table');
             tbody.innerHTML = '';
             data.users.forEach(u => {
-                tbody.innerHTML += `<tr><td>${u.email}</td><td>${u.username}</td><td>${u.package}</td><td style="color: ${u.status==='Active'?'#00ff00':'orange'}">${u.status}</td><td>${u.slip_path ? `<a href="http://localhost:8000/${u.slip_path}" target="_blank" style="color:var(--neon-blue);">View Slip</a>` : 'N/A'}</td><td>${u.status === 'Requested' ? `<button onclick="approveUser('${u.email}')">Activate</button>` : '-'}</td></tr>`;
+                tbody.innerHTML += `<tr><td>${u.email}</td><td>${u.username}</td><td>${u.package}</td><td style="color: ${u.status==='Active'?'#00ff00':'orange'}">${u.status}</td><td>${u.slip_path ? `<a href="${BOT_URL}/${u.slip_path}" target="_blank" style="color:var(--neon-blue);">View Slip</a>` : 'N/A'}</td><td>${u.status === 'Requested' ? `<button onclick="approveUser('${u.email}')">Activate</button>` : '-'}</td></tr>`;
             });
         }
+        
         async function approveUser(email) {
-            const res = await fetch("http://localhost:8000/api/admin/approve", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({email}) });
+            const res = await fetch(`${BOT_URL}/api/admin/approve`, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({email}) });
             const data = await res.json(); alert(data.message); loadUsers();
         }
+        
         function searchUsers() {
             const input = document.getElementById('search-user').value.toUpperCase();
             const rows = document.querySelectorAll('#user-table tr');
